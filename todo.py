@@ -8,7 +8,7 @@ import tkinter
 db = dataset.connect('sqlite:///todo.db')
 
 # define the var items as our table
-#items = db.create_table('items', primary_id='id', primary_type='Integer')
+items = db.create_table('items', primary_id='id', primary_type='Integer')
 items = db['items']
 listUpdated = False
 
@@ -46,7 +46,7 @@ class Todo(tkinter.Tk):
 
         # entry box & button for new todo items
         self.entry = tkinter.Entry()
-        self.entry.pack(fill=tkinter.BOTH, expand=0
+        self.entry.pack(fill=tkinter.BOTH, expand=0)
 
         entryButton = tkinter.Button(text="Enter", command=self.addToList)
         entryButton.pack(fill=tkinter.BOTH, expand=0)

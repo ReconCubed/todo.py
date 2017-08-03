@@ -4,13 +4,19 @@
 
 import dataset
 import tkinter
+import datetime
 # connect to the todo database
 db = dataset.connect('sqlite:///todo.db')
 
 # define the var items as our table
-items = db.create_table('items', primary_id='id', primary_type='Integer')
+#items = db.create_table('items', primary_id='id', primary_type='Integer')
 items = db['items']
-listUpdated = False
+
+# time management
+date_time = datetime.datetime.now()
+date = date_time.date()  # gives date
+time = date_time.time()  # gives time
+
 
 # DEBUGGING FUNCS
 def dropRefresh():
@@ -19,6 +25,7 @@ def dropRefresh():
 
 # print all items in the table
 def debugPrint():
+    print("---------------------------")
     for item in db['items']:
         print(item['id'], item['node'], sep='. ')
 
@@ -28,7 +35,8 @@ def deleteAll():
 
 # insert a new item into our table
 def newItem(item):
-    items.insert(dict(node=item))
+    curTime= str(date.day) + '/' + str(date.month) + '/' + str(date.year)
+    items.insert(dict(node=item, creationtime=curTime))
 
 
 # remove an item from our table
@@ -60,8 +68,11 @@ class Todo(tkinter.Tk):
 
         # update the application on startup with items already
         # in the database
+        self.refreshList()
+
+    def refreshList(self):
         for items in db['items']:
-            item = str(items['id']) + ". " + str(items['node'])
+            item = str(items['id']) + ". " + str(items['node']) + " - Created at " + str(items['creationtime'])
             self.todoList.insert(tkinter.END, str(item))
             self.todoList.update_idletasks()
 
@@ -75,14 +86,11 @@ class Todo(tkinter.Tk):
         # delete the text in the box
         self.entry.delete(0, 'end')
         # get all the items back again, refreshing them all
-        for items in db['items']:
-            item = str(items['id']) + ". " + str(items['node'])
-            self.todoList.insert(tkinter.END, str(item))
-            self.todoList.update_idletasks()
+        self.refreshList()
         debugPrint()
 
     def deleteFromList(self):
-        # deletes an item from the datavase
+        # deletes an item from the database
         removeItem(int(self.deleteOption.get()))
         # deletes everything from the list
         self.todoList.delete(0, tkinter.END)
@@ -91,10 +99,7 @@ class Todo(tkinter.Tk):
         # clear the deleteOption entry box
         self.deleteOption.delete(0, 'end')
         # refresh the list by getting them all from the database
-        for items in db['items']:
-            item = str(items['id']) + ". " + str(items['node'])
-            self.todoList.insert(tkinter.END, str(item))
-            self.todoList.update_idletasks()
+        self.refreshList()
         debugPrint()
 
 if __name__ == "__main__":
